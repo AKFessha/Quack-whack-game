@@ -6,6 +6,7 @@
     <title>Quack Whack Game</title>
     <script src="js/aframe-0.8.0.min.js"></script>
     <script src="js/aframe-physics-system-3.0.2.min.js"></script>
+    <script src="js/cursor-listener.js"></script>
 
 </head>
 
@@ -54,15 +55,23 @@
         const qS = (selector) => document.querySelector(selector);
         let hit = false;
         let resetId = 0;
+        let targetPos = [[-4.5, 4, -2], [-3, 4, -4], [0, 4, -4], [3, 4, -4], [4.5, 4, -2]];
+        let oldPos = 2;
+        let randPos = 2;
 
         const resetTarget = () => {
             clearTimeout(resetId);
-            qS("#target").body.position.set(0, 3, -3);
+            oldPos = randPos;
+            do {
+                randPos = Math.floor(Math.random() * Math.floor(5));
+            }
+            while (randPos === oldPos);
+            qS("#target").body.position.set(targetPos[randPos][0], targetPos[randPos][1], targetPos[randPos][2]);
             qS("#target").body.velocity.set(0, 0, 0);
             qS("#target").body.angularVelocity.set(0, 0, 0);
             hit = false;
             resetId = setTimeout(resetTarget, 4000);
-        };
+        }
 
         qS("#bullet").addEventListener('collide', (e) => {
             let target = qS("#target");

@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <a-scene physics="gravity: -5" stats>
+    <a-scene physics="gravity: 0" stats>
         <a-assets>
             <img id="sky" src="img/sky.png">
             <img id="ground" src="img/ground.png">
@@ -33,7 +33,7 @@
 
         <a-box id="target" src="#targetImg" position="0 4 -3" rotation="20 40 0" dynamic-body="mass: 1;" cursor-listener></a-box>
 
-        <a-sphere id="bullet" position="0 0.5 -3" radius="0.3" opacity="0" dynamic-body="mass: 1;">
+        <a-sphere id="bullet" position="0 -5 0" radius="0.3" opacity="0" dynamic-body="mass: 1;">
             <a-entity position="0 -0.2 0" gltf-model="#duck"></a-entity>
         </a-sphere>
 
@@ -59,7 +59,9 @@
         let targetPos = [[-4.5, 4, -2], [-3, 4, -4], [0, 4, -4], [3, 4, -4], [4.5, 4, -2]];
         let oldPos = 2;
         let randPos = 2;
-        let shootingAllowed = false;
+        let shootingAllowed = true;
+        let velo = 0;
+        let dVelo = -0.05;
 
         const resetTarget = () => {
             clearTimeout(resetId);
@@ -69,22 +71,27 @@
             }
             while (randPos === oldPos);
             qS("#target").body.position.set(targetPos[randPos][0], targetPos[randPos][1], targetPos[randPos][2]);
-            qS("#target").body.velocity.set(0, 0, 0);
-            qS("#target").body.angularVelocity.set(0, 0, 0);
+
+            velo += dVelo;
+            qS("#target").body.velocity.set(0, velo, 0);
+            qS("#target").setAttribute("rotation", "0 0 0");
             hit = false;
-            resetId = setTimeout(resetTarget, 4000);
+            let randX = (Math.random() * 2) - 1;
+            let randY = (Math.random() * 2) - 1;
+            let randZ = (Math.random() * 2) - 1;
+            qS("#target").body.angularVelocity.set(randX, randY, randZ);
         }
 
         qS("#bullet").addEventListener('collide', (e) => {
             let target = qS("#target");
             if (e.detail.body.id === target.body.id && !hit) {
+                console.log('Collision!');
                 hit = true;
+                clearTimeout(resetId);
+                resetId = setTimeout(resetTarget, 1);
             }
         });
-
-        setTimeout(resetTarget, 4000);
     </script>
-
 </body>
 
 </html>
